@@ -23,7 +23,7 @@ module RailsSettingsUi::SettingsHelper
   def checkboxes_group_field(setting_name, all_settings)
     field = ""
     RailsSettingsUi.settings_klass.defaults[setting_name.to_sym].each do |value|
-      checked = all_settings[setting_name.to_s].map(&:to_s).include?(value)
+      checked = all_settings[setting_name.to_s].map(&:to_s).include?(value.to_s)
       field << check_box_tag("settings[#{setting_name.to_s}][#{value.to_s}]", nil, checked, style: "margin: 0 10px;")
       field << label_tag("settings[#{setting_name.to_s}][#{value.to_s}]", I18n.t("settings.attributes.#{setting_name}.labels.#{value}", default: value.to_s), style: "display: inline-block;")
     end
@@ -31,8 +31,12 @@ module RailsSettingsUi::SettingsHelper
   end
 
   def checkbox_field(setting_name, setting_value)
-    hidden_field_tag("settings[#{setting_name.to_s}]", 'off').html_safe +
-    check_box_tag("settings[#{setting_name.to_s}]", nil, setting_value).html_safe
+    help_block_content = I18n.t("settings.attributes.#{setting_name}.help_block", default: '')
+    fields = ""
+    fields << hidden_field_tag("settings[#{setting_name.to_s}]", 'off').html_safe
+    fields << check_box_tag("settings[#{setting_name.to_s}]", nil, setting_value).html_safe
+    fields << content_tag(:span, help_block_content, class: 'help-block') if help_block_content.presence
+    fields.html_safe
   end
 
   def text_field(setting_name, setting_value, options = {})
